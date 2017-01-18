@@ -5,45 +5,19 @@ import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
 
 import { Field, reduxForm, propTypes } from 'redux-form/immutable';
+import {renderField} from '../helpers/form';
 
-// import {getCurrentPerson} from '../reducers/peopleReducer';
+
 //Get required actions
-import {getFoundCustomer} from '../store/modules/customers';
-
-const renderField = ({ input, label, type, meta: { touched, error } }) => (
-  <div>
-      <input {...input} placeholder={label} type={type} className="form-control"/>
-      {touched && (error && <span className="error">{error}</span>)}
-  </div>
-);
-
-// renderField.propTypes = {
-//     ...propTypes,
-// };
-
-
-//VALIDATIONS
-const maxLength = max => value =>
-  value && value.length > max ? `Must be ${max} characters or less` : undefined;
-const maxLength14 = maxLength(14);
-
-// const digitsOnly = max => value =>
-//   value && (!/^\d{max}$/.test(value)) ? `Must exactly ${max} digits` : undefined;
-// const digitsOnly14 = digitsOnly(14);
-
-const digitsOnly = value =>
-  value && (!/^\d*$/.test(value)) ? `Only digits please` : undefined;
-// const digitsOnly14 = digitsOnly(14);
+import {getFoundCustomer, updateCustomer} from '../store/modules/customers';
 
 const validate = values => {
     const errors = {};
-    const ecid = values.get('ecid');
+    const firstName = values.get('name.first');
 
-    if (!ecid) {
-        errors.ecid = 'Required';
-    } else if (!/^\d{14}$/.test(ecid)) {
-        errors.ecid = 'ECID must be a string of 14 digits characters';
-    }
+    if (!firstName) {
+        errors['name.first'] = 'Required';
+    } 
     return errors;
 };
 
@@ -61,21 +35,50 @@ class CustomerForm extends Component {
     }
 
     handleFormSubmit(values) {
-        const ecid = values.get('ecid');
-        this.props.actions.loadPerson(ecid);
+        // values.get("name").get('first');
+        // values.get("name").get('title');
+        // values.get("name").get('last');
+        // values.get("gender");
+
+        this.props.actions.updateCustomer(values);
     }
 
     render() {
         const { handleSubmit, submitting } = this.props;
 
         return (
-            <div className="col-sm-4 col-sm-offset-4">
+            <div className="col-sm-8 col-sm-offset-2">
                 <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="form-horizontal">
                     <div className="form-group">
-                        <label className="h3">Search customer by ECID</label>
-                        <Field name="ecid" type="text" component={renderField} label="ECID" validate={[ maxLength14, digitsOnly ]}/>
-                        <br/>
-                        <button action="submit" className="btn btn-danger" disabled={submitting}>Search</button>
+                        <label className="col-sm-2 control-label" htmlFor="name.title">Title:</label>
+                        <div className="col-sm-8">
+                        <Field name="name.title" type="text" component={renderField} className="form-control col-sm-4"/>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label className="col-sm-2 control-label" htmlFor="name.first">First Name:</label>
+                        <div className="col-sm-8">
+                        <Field name="name.first" type="text" component={renderField} className="form-control"/>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label className="col-sm-2 control-label" htmlFor="name.last">Last Name:</label>
+                        <div className="col-sm-8">
+                        <Field name="name.last" type="text" component={renderField} className = "form-control"/>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label className="col-sm-2 control-label" htmlFor="Gender">Gender:</label>
+                        <div className="col-sm-4">
+                            <Field name="gender" component="select" className="form-control">
+                                <option/>
+                                <option name="Male">Male</option>
+                                <option name="Female">Female</option>
+                            </Field>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                    <button action="submit" className="col-sm-offset-2 btn btn-danger" disabled={submitting}>Save changes</button>
                     </div>
                 </form>
             </div>
@@ -91,15 +94,15 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({loadPerson}, dispatch)
+    actions: bindActionCreators({updateCustomer}, dispatch)
   };
 }
 
 // Decorate with reduxForm(). It will read the initialValues prop provided by connect()
 let boundForm = reduxForm({
-  form: 'CustomerForm',  // a unique identifier for this form
-  validate,
-//   enableReinitialize: true
+    form: 'CustomerForm',  // a unique identifier for this form
+    enableReinitialize: true,
+    validate,
 })(CustomerForm);
 
 export default connect(mapStateToProps,mapDispatchToProps)(boundForm);

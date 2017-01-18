@@ -55,8 +55,10 @@ class CustomerSearchForm extends Component {
             <div className="col-sm-4 col-sm-offset-4">
                 <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="form-horizontal">
                     <div className="form-group">
-                        <label className="h3">Search customer by ECID</label>
-                        <Field name="ecid" type="text" props={maxLength} component={renderField} label="ECID" validate={[ maxLength14, digitsOnly ]}/>
+                        <label className="h4">Search customer by ECID</label>
+                        <Field name="ecid" type="text" props={maxLength} component={renderField} label="ECID" 
+                            className="form-control"
+                            validate={[ maxLength14, digitsOnly ]}/>
                         <br/>
                         <button action="submit" className="btn btn-danger" disabled={submitting}>Search</button>
                     </div>

@@ -5,8 +5,8 @@ export const renderField = field => (
     <div>
       <input {...field.input} 
         maxLength = {field.maxLength?field.maxLength:''}
-        placeholder={field.label} 
-        className="form-control"/>
+        className = {field.className}
+        placeholder={field.label}/>
 
       {field.meta.touched && (field.meta.error && <span className="error">{field.meta.error}</span>)}
     </div>

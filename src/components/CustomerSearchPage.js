@@ -3,7 +3,11 @@ import React from 'react';
 import CustomerSearchForm from './CustomerSearchForm';
 
 const CustomerSearchPage = () => {
-    return (<div><CustomerSearchForm/></div>);
+    return (
+        <div>
+            <CustomerSearchForm/>
+        </div>
+        );
     };
 
 export default CustomerSearchPage;
