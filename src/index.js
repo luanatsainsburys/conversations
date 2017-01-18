@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import routes from './routes';
 
-import {Immutable} from 'immutable';
+// import {Immutable} from 'immutable';
 import configureStore from './store/configureStore';
 require('./favicon.ico'); // Tell webpack to load favicon.ico
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'; //Webpack can import CSS files too!

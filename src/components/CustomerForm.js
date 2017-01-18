@@ -4,12 +4,23 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
 
-//Form helpers
 import { Field, reduxForm, propTypes } from 'redux-form/immutable';
-import {renderField} from '../helpers/form';
 
+// import {getCurrentPerson} from '../reducers/peopleReducer';
 //Get required actions
-import {loadPerson} from '../store/modules/customers';
+import {getFoundCustomer} from '../store/modules/customers';
+
+const renderField = ({ input, label, type, meta: { touched, error } }) => (
+  <div>
+      <input {...input} placeholder={label} type={type} className="form-control"/>
+      {touched && (error && <span className="error">{error}</span>)}
+  </div>
+);
+
+// renderField.propTypes = {
+//     ...propTypes,
+// };
+
 
 //VALIDATIONS
 const maxLength = max => value =>
@@ -36,10 +47,17 @@ const validate = values => {
     return errors;
 };
 
-class CustomerSearchForm extends Component {
+class CustomerForm extends Component {
     static propTypes = {
         ...propTypes,
         // other props you might be using
+    }
+
+    componentDidMount() {
+        this.handleInitialize();
+    }
+
+    handleInitialize() {
     }
 
     handleFormSubmit(values) {
@@ -49,14 +67,13 @@ class CustomerSearchForm extends Component {
 
     render() {
         const { handleSubmit, submitting } = this.props;
-        const maxLength = {"maxLength": 14};
 
         return (
             <div className="col-sm-4 col-sm-offset-4">
                 <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="form-horizontal">
                     <div className="form-group">
                         <label className="h3">Search customer by ECID</label>
-                        <Field name="ecid" type="text" props={maxLength} component={renderField} label="ECID" validate={[ maxLength14, digitsOnly ]}/>
+                        <Field name="ecid" type="text" component={renderField} label="ECID" validate={[ maxLength14, digitsOnly ]}/>
                         <br/>
                         <button action="submit" className="btn btn-danger" disabled={submitting}>Search</button>
                     </div>
@@ -64,6 +81,12 @@ class CustomerSearchForm extends Component {
             </div>
         );
     }
+}
+
+function mapStateToProps(state) {
+  return {
+    initialValues: getFoundCustomer(state)
+  };
 }
 
 function mapDispatchToProps(dispatch) {
@@ -74,9 +97,9 @@ function mapDispatchToProps(dispatch) {
 
 // Decorate with reduxForm(). It will read the initialValues prop provided by connect()
 let boundForm = reduxForm({
-  form: 'CustomerSearchForm',  // a unique identifier for this form
+  form: 'CustomerForm',  // a unique identifier for this form
   validate,
 //   enableReinitialize: true
-})(CustomerSearchForm);
+})(CustomerForm);
 
-export default connect(null,mapDispatchToProps)(boundForm);
+export default connect(mapStateToProps,mapDispatchToProps)(boundForm);
