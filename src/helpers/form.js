@@ -13,3 +13,26 @@ export const renderField = field => (
 );
 
 renderField.propTypes = Object.assign({}, ...propTypes, {label:React.PropTypes.string});
+
+
+export const renderCheckbox = field => {
+  console.log(field);
+  return (
+      <input {...field.input} 
+        type="checkbox"
+        className = {"checkbox" + field.className?field.className:""}/>);
+};
+
+export function transformYesNo (customer){
+    let transformed = customer.get('suppressions').map((value, key) => 
+    {
+      if (typeof value === "string") {
+        return value.toLowerCase()==="yes";
+      } 
+      // else if (typeof value === "boolean") {
+      //   return value?"Yes":"No"; //Convert the other way.
+      // }
+  });
+
+  return customer.set('suppressions',transformed);
+}

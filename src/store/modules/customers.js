@@ -40,7 +40,7 @@ function fetchPersonFromServer(ecid) {
     const headers = {
         'Access-Control-Allow-Origin':'*',
         
-        'Origin': 'http://localhost:3000',
+        //'Origin': 'http://localhost:3000',
        'Accept': 'application/json',
         //'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Content-Type': 'application/json',
@@ -56,8 +56,8 @@ function fetchPersonFromServer(ecid) {
         //cache: 'default'
  };
 
-  return fetch('http://devtlnx0157.stbc2.jstest2.net:15100/v2/customer-profiles/'+ ecid + '?type=ecid', options);
-//  return fetch('http://devtlnx0157.stbc2.jstest2.net:15100/v2/customer-profiles/50000007797810?type=ecid', options);
+  //return fetch('http://devtlnx0157.stbc2.jstest2.net:15100/v2/customer-profiles/'+ ecid + '?type=ecid', options);
+  return fetch('http://devtlnx0157.stbc2.jstest2.net:15100/v2/customer-profiles/50000007797810?type=ecid', options);
   //return fetch('/v2/customer-profiles/50000007797810?type=ecid', options);
 }
 

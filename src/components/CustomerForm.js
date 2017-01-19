@@ -5,7 +5,7 @@ import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
 
 import { Field, reduxForm, propTypes } from 'redux-form/immutable';
-import {renderField} from '../helpers/form';
+import {renderField, renderCheckbox, transformYesNo} from '../helpers/form';
 
 
 //Get required actions
@@ -20,6 +20,17 @@ const validate = values => {
     } 
     return errors;
 };
+
+function makeCheckbox (objName, propName) {
+    return (
+                            <div className="checkbox">
+                                <label>
+                                    <Field name={objName+'.'+propName} id={objName+'.'+propName} component={renderCheckbox}/>
+                                    {propName}
+                                </label>
+                            </div>
+    );
+} 
 
 class CustomerForm extends Component {
     static propTypes = {
@@ -78,6 +89,27 @@ class CustomerForm extends Component {
                         </div>
                     </div>
                     <div className="form-group">
+                        <label className="col-sm-2 control-label" htmlFor="date_of_birth">Date of Birth:</label>
+                        <div className="col-sm-4">
+                        <Field name="date_of_birth" type="text" component={renderField} className = "form-control"/>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label className="col-sm-2 control-label">Suppressions:</label>
+                        <fieldset className="col-sm-4">
+                                {makeCheckbox("suppressions","by_postal_provider")}
+                                {makeCheckbox("suppressions","by_email_provider")}
+                                {makeCheckbox("suppressions","has_gas_gone_away")}
+                                {makeCheckbox("suppressions","has_qinetic_gone_away")}
+                                {makeCheckbox("suppressions","has_qinetic_deceased")}
+                                {makeCheckbox("suppressions","is_baby_mps_registered")}
+                                {makeCheckbox("suppressions","is_email_hard_bounce")}
+                                {makeCheckbox("suppressions","is_manual")}
+                                {makeCheckbox("suppressions","mps_registered")}
+                                {makeCheckbox("suppressions","is_national_deceased_registered")}
+                        </fieldset>
+                    </div>
+                    <div className="form-group">
                     <button action="submit" className="col-sm-offset-2 btn btn-danger" disabled={submitting}>Save changes</button>
                     </div>
                 </form>
@@ -88,7 +120,7 @@ class CustomerForm extends Component {
 
 function mapStateToProps(state) {
   return {
-    initialValues: getFoundCustomer(state)
+    initialValues: transformYesNo(getFoundCustomer(state))
   };
 }
 
