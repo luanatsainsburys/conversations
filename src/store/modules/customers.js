@@ -19,7 +19,7 @@ export const FETCH_CUSTOMER_FAILURE = 'road-runner/customer/FETCH_CUSTOMER_FAILU
 export default function reducer(state = initialState.get('foundCustomer'), action = {}) {
     switch (action.type) {
         case FETCH_CUSTOMER_SUCCESS:
-            return Immutable.Map(['customer', action.customer],['success', true], ['errorMessage', '']);
+            return Immutable.Map.of('customer', action.customer,'success', true, 'errorMessage', '');
 
         case FETCH_CUSTOMER_FAILURE:
             return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', action.error.message);
@@ -42,15 +42,10 @@ export default function reducer(state = initialState.get('foundCustomer'), actio
 
 function fetchPersonFromServer(ecid) {
     const headers = {
-        //'Access-Control-Allow-Origin':'*',
-        
-        //'Origin': 'http://localhost:3000',
        'Accept': 'application/json',
-        //'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Content-Type': 'application/json',
 //        'Authorization': 'Basic '+btoa('SIPTester:SIPTester'),
         'Authorization': makeBaseAuth('SIPTester','SIPTester'),
-        //'Cache-control': 'no-cache'
     };
 
     const options = {
