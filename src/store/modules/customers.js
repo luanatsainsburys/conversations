@@ -94,6 +94,10 @@ function customerFetchFailure(error) {
   return { type: FETCH_CUSTOMER_FAILURE, error };
 }
 
+export function resetFoundCustomer() {
+  return { type: RESET_FOUND_CUSTOMER };
+}
+
 export function createPerson(customer) {
   return { type: CREATE, customer };
 }

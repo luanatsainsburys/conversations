@@ -9,7 +9,7 @@ import { Field, reduxForm, propTypes } from 'redux-form/immutable';
 import {renderField} from '../helpers/form';
 
 //Get required actions
-import {fetchCustomer} from '../store/modules/customers';
+import {fetchCustomer, resetFoundCustomer} from '../store/modules/customers';
 
 //VALIDATIONS
 const maxLength = max => value =>
@@ -44,6 +44,7 @@ class CustomerSearchForm extends Component {
 
     handleFormSubmit(values) {
         const ecid = values.get('ecid');
+        this.props.actions.resetFoundCustomer();
         this.props.actions.fetchCustomer(ecid);
     }
 
@@ -70,7 +71,7 @@ class CustomerSearchForm extends Component {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({fetchCustomer}, dispatch)
+    actions: bindActionCreators({fetchCustomer, resetFoundCustomer}, dispatch)
   };
 }
 
