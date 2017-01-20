@@ -23,6 +23,8 @@ export const renderCheckbox = field => {
 };
 
 export function transformYesNo (customer){
+    if (customer.isEmpty()) return customer;
+
     let transformed = customer.get('suppressions').map((value, key) => 
     {
       if (typeof value === "string") {

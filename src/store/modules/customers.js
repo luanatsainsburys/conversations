@@ -6,7 +6,6 @@ import fetch from 'isomorphic-fetch';
 
 // Actions
 const CREATE = 'road-runner/customer/CREATE';
-//const UPDATE = 'road-runner/customer/UPDATE';
 const REMOVE = 'road-runner/customer/REMOVE';
 //const LOADING = 'road-runner/customer/LOADING';
 
@@ -14,6 +13,8 @@ export const FETCH_CUSTOMER = 'road-runner/customer/FETCH_CUSTOMER';
 export const FETCH_CUSTOMER_SUCCESS = 'road-runner/customer/FETCH_CUSTOMER_SUCCESS';
 export const FETCH_CUSTOMER_FAILURE = 'road-runner/customer/FETCH_CUSTOMER_FAILURE';
 //export const RESET_ACTIVE_CUSTOMER = 'road-runner/customer/RESET_ACTIVE_CUSTOMER';
+
+export const UPDATE_CUSTOMER = 'road-runner/customer/UPDATE_CUSTOMER';
 
 // Reducer
 export default function reducer(state = initialState.get('foundCustomer'), action = {}) {
@@ -29,16 +30,15 @@ export default function reducer(state = initialState.get('foundCustomer'), actio
     }
 }
 
-// Action Creators
 
-   function makeBaseAuth (user, pswd){ 
-      let token = user + ':' + pswd;
-      let hash = "";
-      if (btoa) {
-         hash = btoa(token);
-      }
-      return "Basic " + hash;
-   }
+function makeBaseAuth (user, pswd){ 
+    let token = user + ':' + pswd;
+    let hash = "";
+    if (btoa) {
+        hash = btoa(token);
+    }
+    return "Basic " + hash;
+}
 
 function fetchPersonFromServer(ecid) {
     const headers = {
@@ -59,6 +59,8 @@ function fetchPersonFromServer(ecid) {
   //return fetch('http://devtlnx0157.stbc2.jstest2.net:15100/v2/customer-profiles/50000007797810?type=ecid', options);
   //return fetch('/v2/customer-profiles/50000007797810?type=ecid', options);
 }
+
+// Action Creators
 
 export function fetchCustomer(ecid) {
     return (dispatch) => {
@@ -93,9 +95,9 @@ export function createPerson(customer) {
   return { type: CREATE, customer };
 }
 
-// export function updateCustomer(customer) {
-//   return { type: UPDATE, customer };
-// }
+export function updateCustomer(customer) {
+  return { type: UPDATE_CUSTOMER, customer };
+}
 
 export function removePerson(customer) {
   return { type: REMOVE, customer };
@@ -103,7 +105,7 @@ export function removePerson(customer) {
 
 //Selectors
 export function getFoundCustomer (state) {
-  return state.get(['foundCustomer', 'customer']);
+  return state.getIn(['foundCustomer', 'customer']);
 }
 
 
