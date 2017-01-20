@@ -13,7 +13,7 @@ const CustomerSearchPage = (props) => {
             </div>
             {!props.foundCustomer.get('success') && props.foundCustomer.get('errorMessage') &&
                 <div className="row">
-                    <div className="col-sm-4 col-sm-offset-4">
+                    <div className="col-sm-offset-4">
                         <span className="error">{props.foundCustomer.get('errorMessage')}</span>
                     </div>
                 </div>

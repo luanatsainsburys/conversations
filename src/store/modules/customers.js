@@ -12,7 +12,7 @@ const REMOVE = 'road-runner/customer/REMOVE';
 export const FETCH_CUSTOMER = 'road-runner/customer/FETCH_CUSTOMER';
 export const FETCH_CUSTOMER_SUCCESS = 'road-runner/customer/FETCH_CUSTOMER_SUCCESS';
 export const FETCH_CUSTOMER_FAILURE = 'road-runner/customer/FETCH_CUSTOMER_FAILURE';
-//export const RESET_ACTIVE_CUSTOMER = 'road-runner/customer/RESET_ACTIVE_CUSTOMER';
+export const RESET_FOUND_CUSTOMER = 'road-runner/customer/RESET_FOUND_CUSTOMER';
 
 export const UPDATE_CUSTOMER = 'road-runner/customer/UPDATE_CUSTOMER';
 
@@ -25,8 +25,11 @@ export default function reducer(state = initialState.get('foundCustomer'), actio
         case FETCH_CUSTOMER_FAILURE:
             return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', action.error.message);
 
-        // do reducer stuff
-        default: return state;
+        case RESET_FOUND_CUSTOMER:
+            return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', '');
+
+        default: 
+            return state;
     }
 }
 
