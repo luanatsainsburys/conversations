@@ -16,7 +16,6 @@ renderField.propTypes = Object.assign({}, ...propTypes, {label:React.PropTypes.s
 
 
 export const renderCheckbox = field => {
-  console.log(field);
   return (
       <input {...field.input} 
         type="checkbox"

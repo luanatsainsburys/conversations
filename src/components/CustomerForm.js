@@ -134,7 +134,7 @@ function mapDispatchToProps(dispatch) {
 let boundForm = reduxForm({
     form: 'CustomerForm',  // a unique identifier for this form
     enableReinitialize: true,
-    validate,
+    //validate,
 })(CustomerForm);
 
 export default connect(mapStateToProps,mapDispatchToProps)(boundForm);

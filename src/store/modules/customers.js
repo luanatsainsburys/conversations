@@ -5,20 +5,24 @@ import initialState from '../../reducers/initialState';
 import fetch from 'isomorphic-fetch';
 
 // Actions
-const LOAD   = 'road-runner/person/LOAD';
-const CREATE = 'road-runner/person/CREATE';
-const UPDATE = 'road-runner/person/UPDATE';
-const REMOVE = 'road-runner/person/REMOVE';
-//const LOADING = 'road-runner/person/LOADING';
+const CREATE = 'road-runner/customer/CREATE';
+//const UPDATE = 'road-runner/customer/UPDATE';
+const REMOVE = 'road-runner/customer/REMOVE';
+//const LOADING = 'road-runner/customer/LOADING';
+
+export const FETCH_CUSTOMER = 'road-runner/customer/FETCH_CUSTOMER';
+export const FETCH_CUSTOMER_SUCCESS = 'road-runner/customer/FETCH_CUSTOMER_SUCCESS';
+export const FETCH_CUSTOMER_FAILURE = 'road-runner/customer/FETCH_CUSTOMER_FAILURE';
+//export const RESET_ACTIVE_CUSTOMER = 'road-runner/customer/RESET_ACTIVE_CUSTOMER';
 
 // Reducer
-export default function reducer(state = initialState.get('person'), action = {}) {
+export default function reducer(state = initialState.get('foundCustomer'), action = {}) {
     switch (action.type) {
-        case LOAD:
-            return Immutable.fromJS(action.person);//Plain js object from server
+        case FETCH_CUSTOMER_SUCCESS:
+            return Immutable.Map(['customer', action.customer],['success', true], ['errorMessage', '']);
 
-        case UPDATE:
-            return action.customer;//Already immutable type
+        case FETCH_CUSTOMER_FAILURE:
+            return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', action.error.message);
 
         // do reducer stuff
         default: return state;
@@ -38,7 +42,7 @@ export default function reducer(state = initialState.get('person'), action = {})
 
 function fetchPersonFromServer(ecid) {
     const headers = {
-        'Access-Control-Allow-Origin':'*',
+        //'Access-Control-Allow-Origin':'*',
         
         //'Origin': 'http://localhost:3000',
        'Accept': 'application/json',
@@ -46,65 +50,65 @@ function fetchPersonFromServer(ecid) {
         'Content-Type': 'application/json',
 //        'Authorization': 'Basic '+btoa('SIPTester:SIPTester'),
         'Authorization': makeBaseAuth('SIPTester','SIPTester'),
-        'Cache-control': 'no-cache'
+        //'Cache-control': 'no-cache'
     };
 
     const options = {
         method: 'GET',
         headers: headers,
-        mode: 'cors'
-        //cache: 'default'
+        mode: 'cors',
+        cache: 'default'
  };
 
-  //return fetch('http://devtlnx0157.stbc2.jstest2.net:15100/v2/customer-profiles/'+ ecid + '?type=ecid', options);
-  return fetch('http://devtlnx0157.stbc2.jstest2.net:15100/v2/customer-profiles/50000007797810?type=ecid', options);
+  return fetch('http://devtlnx0157.stbc2.jstest2.net:15100/v2/customer-profiles/'+ ecid + '?type=ecid', options);
+  //return fetch('http://devtlnx0157.stbc2.jstest2.net:15100/v2/customer-profiles/50000007797810?type=ecid', options);
   //return fetch('/v2/customer-profiles/50000007797810?type=ecid', options);
 }
 
-function errorHandler (error) {
-        console.log('Error:'+error+' getting person ');
-}
-
-export function loadPerson(name) {
+export function fetchCustomer(ecid) {
     return (dispatch) => {
-        //dispatch(dataIsLoading(true));
-        fetchPersonFromServer(name)
+        dispatch(fetchingCustomer(true));
+        fetchPersonFromServer(ecid)
         .then((response) => {
                 if (!response.ok) {
-                    throw Error(response.statusText);
+                    throw Error('Error ' + response.status + '-' + response.statusText);
                 }
-                //dispatch(dataIsLoading(false));
+                dispatch(fetchingCustomer(false));
                 return response;
             })
         .then((response) => response.json())
-//        .then((items) => dispatch(itemsFetchDataSuccess(items)))
-        .then((customer) => dispatch(updateCustomer(Immutable.fromJS(customer.enterprise_customer))))
-//        .catch(() => dispatch(itemsHasErrored(true)));
-        .catch(errorHandler);
+        .then((customer) => dispatch(customerFetchSuccess(Immutable.fromJS(customer.enterprise_customer))))
+        .catch((error) => dispatch(customerFetchFailure(error)));
     };
 }
 
+function fetchingCustomer(isFetching) {
+  return { type: FETCH_CUSTOMER, isFetching };
+}
 
+function customerFetchSuccess(customer) {
+  return { type: FETCH_CUSTOMER_SUCCESS, customer };
+}
 
-// export function loadPerson() {
-//   return { type: LOAD };
+function customerFetchFailure(error) {
+  return { type: FETCH_CUSTOMER_FAILURE, error };
+}
+
+export function createPerson(customer) {
+  return { type: CREATE, customer };
+}
+
+// export function updateCustomer(customer) {
+//   return { type: UPDATE, customer };
 // }
 
-export function createPerson(person) {
-  return { type: CREATE, person };
-}
-
-export function updateCustomer(customer) {
-  return { type: UPDATE, customer };
-}
-
-export function removePerson(person) {
-  return { type: REMOVE, person };
+export function removePerson(customer) {
+  return { type: REMOVE, customer };
 }
 
 //Selectors
 export function getFoundCustomer (state) {
-  return state.get("person");
+  return state.get(['foundCustomer', 'customer']);
 }
 
 
