@@ -18,7 +18,7 @@ const CustomerSearchPage = (props) => {
     let customerLink = props.foundCustomer.get('success') &&
                 <div className="row">
                     <div className="col-sm-offset-4">
-                        <span>We have found this customer. Please select <Link to="/customer-search">this link to view</Link></span>
+                        <span>We have found this customer. Please select <Link to="/customer">this link to view</Link></span>
                     </div>
                 </div>;
 

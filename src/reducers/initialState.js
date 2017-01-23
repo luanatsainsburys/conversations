@@ -1,5 +1,4 @@
 import Immutable from 'immutable';
-//import sampleCustomer from '../store/sampleCustomer';
 
 const initialState = Immutable.fromJS({'routing':{}, 'form':{},
     'foundCustomer': {

@@ -2,7 +2,9 @@
 import Immutable from 'immutable';
 import initialState from '../../reducers/initialState';
 
-import fetch from 'isomorphic-fetch';
+//import fetch from 'isomorphic-fetch';
+import sampleCustomer from '../sampleCustomer';
+
 
 // Actions
 const CREATE = 'road-runner/customer/CREATE';
@@ -20,11 +22,12 @@ export const UPDATE_CUSTOMER = 'road-runner/customer/UPDATE_CUSTOMER';
 export default function reducer(state = initialState.get('foundCustomer'), action = {}) {
     switch (action.type) {
         case FETCH_CUSTOMER_SUCCESS:
-            //Change Yes/No to true/false for suppressions flags
-            return Immutable.Map.of('customer', transformYesNo(action.customer),'success', true, 'errorMessage', '');
+           return Immutable.Map.of('customer', transformYesNo(action.customer),'success', true, 'errorMessage', '');
 
         case FETCH_CUSTOMER_FAILURE:
-            return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', action.error.message);
+            //TOD!!!Remove this line and replace with one below when the back end service works
+            return Immutable.Map.of('customer', transformYesNo(Immutable.fromJS(sampleCustomer)),'success', true, 'errorMessage', '');
+            // return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', action.error.message);
 
         case RESET_FOUND_CUSTOMER:
             return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', '');
