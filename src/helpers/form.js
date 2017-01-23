@@ -19,5 +19,6 @@ export const renderCheckbox = field => {
   return (
       <input {...field.input} 
         type="checkbox"
+        checked={field.input.value}
         className = {"checkbox" + field.className?field.className:""}/>);
 };
