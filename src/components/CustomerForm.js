@@ -21,6 +21,17 @@ const validate = values => {
     return errors;
 };
 
+function makeFormTextField (name, text) {
+    return (
+        <div className="form-group">
+            <label className="col-sm-2 control-label" htmlFor={name}>{text}</label>
+            <div className="col-sm-8">
+            <Field name={name} type="text" component={renderField} className="form-control col-sm-4"/>
+            </div>
+        </div>
+    );
+}
+
 function makeCheckbox (objName, propName) {
     return (
         <div className="checkbox">
@@ -30,12 +41,42 @@ function makeCheckbox (objName, propName) {
             </label>
         </div>
     );
-} 
+}
+
+//imMap - immutable map of the 'contact_method' section of the customer profile record
+//The problem is we wish to display the fields in a certain order rather than random order
+//So this method might not be that useful for now.
+function makeContactMethods(imMap) {
+    if (!imMap) return imMap;
+
+    let allFields = [];
+
+    imMap.forEach(item=>{
+ //       const [...allKeys]= item.keys();
+//        const [addressKeys] = item.get('address').keys();
+//        const [addressKeys] = item.get('address').keys();
+        let iter = item.get('address').keys(), next;
+
+        while (!(next = iter.next()).done) {
+            allFields.push(makeFormTextField('contact_method[0].address.'+ next.value, next.value));
+        }
+    });
+
+    return allFields;
+}
 
 class CustomerForm extends Component {
     static propTypes = {
         ...propTypes,
         // other props you might be using
+    }
+
+    componentWillMount() {
+        //let contactMethods = this.props.initialValues.get('contact_method'); //immutable map
+
+        //const [...mykeys]= this.props.initialValues.getIn(['contact_method',0]).keys()
+
+        //["last_update_date", "address", "phone", "email"]
     }
 
     componentDidMount() {
@@ -55,24 +96,11 @@ class CustomerForm extends Component {
         return (
             <div className="col-sm-8 col-sm-offset-2">
                 <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="form-horizontal">
-                    <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="name.title">Title:</label>
-                        <div className="col-sm-8">
-                        <Field name="name.title" type="text" component={renderField} className="form-control col-sm-4"/>
-                        </div>
-                    </div>
-                    <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="name.first">First Name:</label>
-                        <div className="col-sm-8">
-                        <Field name="name.first" type="text" component={renderField} className="form-control"/>
-                        </div>
-                    </div>
-                    <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="name.last">Last Name:</label>
-                        <div className="col-sm-8">
-                        <Field name="name.last" type="text" component={renderField} className = "form-control"/>
-                        </div>
-                    </div>
+                    {makeFormTextField("name.title", "Title:")}
+                    {makeFormTextField("name.first", "First Name:")}
+                    {makeFormTextField("name.last", "Last Name:")}
+                    {makeFormTextField("name.last_update_date", "Name last update date:")}
+                    {makeFormTextField("name.title", "Title:")}
                     <div className="form-group">
                         <label className="col-sm-2 control-label" htmlFor="Gender">Gender:</label>
                         <div className="col-sm-4">
@@ -83,12 +111,7 @@ class CustomerForm extends Component {
                             </Field>
                         </div>
                     </div>
-                    <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="date_of_birth">Date of Birth:</label>
-                        <div className="col-sm-4">
-                        <Field name="date_of_birth" type="text" component={renderField} className = "form-control"/>
-                        </div>
-                    </div>
+                    {makeFormTextField("date_of_birth", "Date of Birth:")}
                     <div className="form-group">
                         <label className="col-sm-2 control-label">Suppressions:</label>
                         <fieldset className="col-sm-4">
@@ -103,6 +126,9 @@ class CustomerForm extends Component {
                                 {makeCheckbox("suppressions","mps_registered")}
                                 {makeCheckbox("suppressions","is_national_deceased_registered")}
                         </fieldset>
+                    </div>
+                    <div className="form-group">
+                    {makeContactMethods(this.props.initialValues.get('contact_method'))}
                     </div>
                     <div className="form-group">
                     <button action="submit" className="col-sm-offset-2 btn btn-danger" disabled={submitting}>Save changes</button>
