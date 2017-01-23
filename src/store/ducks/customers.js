@@ -20,7 +20,8 @@ export const UPDATE_CUSTOMER = 'road-runner/customer/UPDATE_CUSTOMER';
 export default function reducer(state = initialState.get('foundCustomer'), action = {}) {
     switch (action.type) {
         case FETCH_CUSTOMER_SUCCESS:
-            return Immutable.Map.of('customer', action.customer,'success', true, 'errorMessage', '');
+            //Change Yes/No to true/false for suppressions flags
+            return Immutable.Map.of('customer', transformYesNo(action.customer),'success', true, 'errorMessage', '');
 
         case FETCH_CUSTOMER_FAILURE:
             return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', action.error.message);
@@ -32,7 +33,6 @@ export default function reducer(state = initialState.get('foundCustomer'), actio
             return state;
     }
 }
-
 
 function makeBaseAuth (user, pswd){ 
     let token = user + ':' + pswd;
@@ -115,6 +115,22 @@ export function getFoundCustomer (state) {
   return state.getIn(['foundCustomer', 'customer']);
 }
 
+function transformYesNo (customer){
+    if (customer.isEmpty()) return customer;
+
+    //Change Yes/No to true/false for suppressions flags
+    let transformed = customer.get('suppressions').map((value) => 
+    {
+      if (typeof value === "string") {
+        return value.toLowerCase()==="yes";
+      } 
+      else if (typeof value === "boolean") {
+        return value? "Yes" : "No"; //Convert the other way.
+      }
+  });
+
+  return customer.set('suppressions',transformed);
+}
 
 // export function searchCustomer(url) {
 //     return (dispatch) => {

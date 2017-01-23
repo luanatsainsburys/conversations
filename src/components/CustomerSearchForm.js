@@ -9,7 +9,7 @@ import { Field, reduxForm, propTypes } from 'redux-form/immutable';
 import {renderField} from '../helpers/form';
 
 //Get required actions
-import {fetchCustomer, resetFoundCustomer} from '../store/modules/customers';
+import {fetchCustomer, resetFoundCustomer} from '../store/ducks/customers';
 
 //VALIDATIONS
 const maxLength = max => value =>

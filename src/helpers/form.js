@@ -21,19 +21,3 @@ export const renderCheckbox = field => {
         type="checkbox"
         className = {"checkbox" + field.className?field.className:""}/>);
 };
-
-export function transformYesNo (customer){
-    if (customer.isEmpty()) return customer;
-
-    let transformed = customer.get('suppressions').map((value) => 
-    {
-      if (typeof value === "string") {
-        return value.toLowerCase()==="yes";
-      } 
-      // else if (typeof value === "boolean") {
-      //   return value?"Yes":"No"; //Convert the other way.
-      // }
-  });
-
-  return customer.set('suppressions',transformed);
-}

@@ -5,11 +5,11 @@ import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
 
 import { Field, reduxForm, propTypes } from 'redux-form/immutable';
-import {renderField, renderCheckbox, transformYesNo} from '../helpers/form';
+import {renderField, renderCheckbox} from '../helpers/form';
 
 
 //Get required actions
-import {getFoundCustomer, updateCustomer} from '../store/modules/customers';
+import {getFoundCustomer, updateCustomer} from '../store/ducks/customers';
 
 const validate = values => {
     const errors = {};
@@ -23,12 +23,12 @@ const validate = values => {
 
 function makeCheckbox (objName, propName) {
     return (
-                            <div className="checkbox">
-                                <label>
-                                    <Field name={objName+'.'+propName} id={objName+'.'+propName} component={renderCheckbox}/>
-                                    {propName}
-                                </label>
-                            </div>
+        <div className="checkbox">
+            <label>
+                <Field name={objName+'.'+propName} id={objName+'.'+propName} component={renderCheckbox}/>
+                {propName}
+            </label>
+        </div>
     );
 } 
 
@@ -46,11 +46,6 @@ class CustomerForm extends Component {
     }
 
     handleFormSubmit(values) {
-        // values.get("name").get('first');
-        // values.get("name").get('title');
-        // values.get("name").get('last');
-        // values.get("gender");
-
         this.props.actions.updateCustomer(values);
     }
 
@@ -120,7 +115,7 @@ class CustomerForm extends Component {
 
 function mapStateToProps(state) {
   return {
-    initialValues: transformYesNo(getFoundCustomer(state))
+    initialValues: getFoundCustomer(state)
   };
 }
 
