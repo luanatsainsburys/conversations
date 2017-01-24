@@ -46,7 +46,7 @@ function makeCheckbox (objName, propName) {
 //imMap - immutable map of the 'contact_method' section of the customer profile record
 //The problem is we wish to display the fields in a certain order rather than random order
 //So this method might not be that useful for now.
-function makeContactMethods(imMap) {
+function makeContactMethodsDynamic(imMap) {
     if (!imMap) return imMap;
 
     let allFields = [];
@@ -61,6 +61,42 @@ function makeContactMethods(imMap) {
             allFields.push(makeFormTextField('contact_method[0].address.'+ next.value, next.value));
         }
     });
+
+    return allFields;
+}
+
+function makeContactMethods(imMap) {
+    if (!imMap) return imMap;
+
+    let allFields = [];
+    let iter = imMap.entries(), next, index;
+
+    //Process contact method list
+    while (!(next = iter.next()).done) {
+        index = next.value[0];
+        allFields.push(makeFormTextField('contact_method[' + index + '].address.residence_number', 'residence_number'));
+        allFields.push(makeFormTextField('contact_method[' + index + '].address.line1', 'line1'));
+        allFields.push(makeFormTextField('contact_method[' + index + '].address.line2', 'line2'));
+        allFields.push(makeFormTextField('contact_method[' + index + '].address.line3', 'line3'));
+        allFields.push(makeFormTextField('contact_method[' + index + '].address.city', 'city'));
+        allFields.push(makeFormTextField('contact_method[' + index + '].address.county', 'county'));
+        allFields.push(makeFormTextField('contact_method[' + index + '].address.postcode', 'postcode'));
+        allFields.push(makeFormTextField('contact_method[' + index + '].address.country', 'country'));
+        allFields.push(makeFormTextField('contact_method[' + index + '].address.paf_key', 'paf_key'));
+        allFields.push(makeFormTextField('contact_method[' + index + '].address.last_update_date', 'last_update_date'));
+
+        //Process phone list
+        let iterPhones = next.value[1].get('phone').entries(), nextPhone, phoneFields= []; 
+        while (!(nextPhone = iterPhones.next()).done) {
+            phoneFields.push(makeFormTextField('contact_method[' + index + '].phone[' + nextPhone.value[0] + '].formatted_number', nextPhone.value[1].get('type')));
+        }
+        // let phonesMap = next.value[1].get('phone');//List of phone numbers
+        // let phoneFields = phonesMap.map(item=>{
+        //     allFields.push(makeFormTextField('contact_method[' + index + '].phone.formatted_number[0]', item.get('type')));
+        //     return item;
+        // });
+        allFields.push(<fieldset><legend>Phones</legend>{phoneFields}</fieldset>);
+    }
 
     return allFields;
 }
@@ -128,7 +164,10 @@ class CustomerForm extends Component {
                         </fieldset>
                     </div>
                     <div className="form-group">
-                    {makeContactMethods(this.props.initialValues.get('contact_method'))}
+                        <fieldset>
+                        <legend>Address</legend>
+                            {makeContactMethods(this.props.initialValues.get('contact_method'))}
+                        </fieldset>
                     </div>
                     <div className="form-group">
                     <button action="submit" className="col-sm-offset-2 btn btn-danger" disabled={submitting}>Save changes</button>
