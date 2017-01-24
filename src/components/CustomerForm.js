@@ -65,8 +65,32 @@ function makeContactMethodsDynamic(imMap) {
     return allFields;
 }
 
+function makeSuppressionFields(suppMap) {
+    let suppFields = [];
+    if (!suppMap) return [];
+    suppFields.push(makeCheckbox("suppressions","by_postal_provider"));
+    suppFields.push(makeCheckbox("suppressions","by_email_provider"));
+    suppFields.push(makeCheckbox("suppressions","has_gas_gone_away"));
+    suppFields.push(makeCheckbox("suppressions","has_qinetic_gone_away"));
+    suppFields.push(makeCheckbox("suppressions","has_qinetic_deceased"));
+    suppFields.push(makeCheckbox("suppressions","is_baby_mps_registered"));
+    suppFields.push(makeCheckbox("suppressions","is_email_hard_bounce"));
+    suppFields.push(makeCheckbox("suppressions","is_manual"));
+    suppFields.push(makeCheckbox("suppressions","mps_registered"));
+    suppFields.push(makeCheckbox("suppressions","is_national_deceased_registered"));
+    return (
+        <div className="form-group">
+            <label className="col-sm-2 control-label">Suppressions:</label>
+            <fieldset className="col-sm-4">
+            {suppFields}
+            </fieldset>
+        </div>
+    );
+}
+
+//imMap - immutable map of the 'contact_method' section of the customer profile record
 function makeContactMethods(imMap) {
-    if (!imMap) return imMap;
+    if (!imMap) return [];
 
     let allFields = [];
     let iter = imMap.entries(), next, index;
@@ -74,32 +98,47 @@ function makeContactMethods(imMap) {
     //Process contact method list
     while (!(next = iter.next()).done) {
         index = next.value[0];
-        allFields.push(makeFormTextField('contact_method[' + index + '].address.residence_number', 'residence_number'));
-        allFields.push(makeFormTextField('contact_method[' + index + '].address.line1', 'line1'));
-        allFields.push(makeFormTextField('contact_method[' + index + '].address.line2', 'line2'));
-        allFields.push(makeFormTextField('contact_method[' + index + '].address.line3', 'line3'));
-        allFields.push(makeFormTextField('contact_method[' + index + '].address.city', 'city'));
-        allFields.push(makeFormTextField('contact_method[' + index + '].address.county', 'county'));
-        allFields.push(makeFormTextField('contact_method[' + index + '].address.postcode', 'postcode'));
-        allFields.push(makeFormTextField('contact_method[' + index + '].address.country', 'country'));
-        allFields.push(makeFormTextField('contact_method[' + index + '].address.paf_key', 'paf_key'));
-        allFields.push(makeFormTextField('contact_method[' + index + '].address.last_update_date', 'last_update_date'));
+        let addressFields= [];
+        
+        //Process address
+        addressFields.push(makeFormTextField('contact_method[' + index + '].address.residence_number', 'residence_number'));
+        addressFields.push(makeFormTextField('contact_method[' + index + '].address.line1', 'line1'));
+        addressFields.push(makeFormTextField('contact_method[' + index + '].address.line2', 'line2'));
+        addressFields.push(makeFormTextField('contact_method[' + index + '].address.line3', 'line3'));
+        addressFields.push(makeFormTextField('contact_method[' + index + '].address.city', 'city'));
+        addressFields.push(makeFormTextField('contact_method[' + index + '].address.county', 'county'));
+        addressFields.push(makeFormTextField('contact_method[' + index + '].address.postcode', 'postcode'));
+        addressFields.push(makeFormTextField('contact_method[' + index + '].address.country', 'country'));
+        addressFields.push(makeFormTextField('contact_method[' + index + '].address.paf_key', 'paf_key'));
+        addressFields.push(makeFormTextField('contact_method[' + index + '].address.last_update_date', 'last_update_date'));
+        allFields.push(<fieldset><legend>Address</legend>{addressFields}</fieldset>);
 
-        //Process phone list
-        let iterPhones = next.value[1].get('phone').entries(), nextPhone, phoneFields= []; 
-        while (!(nextPhone = iterPhones.next()).done) {
-            phoneFields.push(makeFormTextField('contact_method[' + index + '].phone[' + nextPhone.value[0] + '].formatted_number', nextPhone.value[1].get('type')));
+        //Process phone list if exists
+        if (next.value[1].has('phone')) {
+            let iterPhones = next.value[1].get('phone').entries(), nextPhone, phoneFields= []; 
+            while (!(nextPhone = iterPhones.next()).done) {
+                phoneFields.push(makeFormTextField('contact_method[' + index + '].phone[' + nextPhone.value[0] + '].formatted_number', 
+                                                    nextPhone.value[1].get('type')));
+            }
+            allFields.push(<fieldset><legend>Phones</legend>{phoneFields}</fieldset>);
         }
-        // let phonesMap = next.value[1].get('phone');//List of phone numbers
-        // let phoneFields = phonesMap.map(item=>{
-        //     allFields.push(makeFormTextField('contact_method[' + index + '].phone.formatted_number[0]', item.get('type')));
-        //     return item;
-        // });
-        allFields.push(<fieldset><legend>Phones</legend>{phoneFields}</fieldset>);
     }
 
     return allFields;
 }
+
+function makeCustomerAccount(custAcc) {
+    if (!custAcc) return null;
+    return (
+        <div className="form-group">
+            <fieldset>
+            <legend>Customer account</legend>
+                {makeFormTextField("customer_account.type", "Name:")}
+                {makeFormTextField("customer_account.id", "Account number:")}
+            </fieldset>
+        </div>
+    );
+} 
 
 class CustomerForm extends Component {
     static propTypes = {
@@ -148,26 +187,9 @@ class CustomerForm extends Component {
                         </div>
                     </div>
                     {makeFormTextField("date_of_birth", "Date of Birth:")}
+                    {makeSuppressionFields(this.props.initialValues.get('suppressions'))}
                     <div className="form-group">
-                        <label className="col-sm-2 control-label">Suppressions:</label>
-                        <fieldset className="col-sm-4">
-                                {makeCheckbox("suppressions","by_postal_provider")}
-                                {makeCheckbox("suppressions","by_email_provider")}
-                                {makeCheckbox("suppressions","has_gas_gone_away")}
-                                {makeCheckbox("suppressions","has_qinetic_gone_away")}
-                                {makeCheckbox("suppressions","has_qinetic_deceased")}
-                                {makeCheckbox("suppressions","is_baby_mps_registered")}
-                                {makeCheckbox("suppressions","is_email_hard_bounce")}
-                                {makeCheckbox("suppressions","is_manual")}
-                                {makeCheckbox("suppressions","mps_registered")}
-                                {makeCheckbox("suppressions","is_national_deceased_registered")}
-                        </fieldset>
-                    </div>
-                    <div className="form-group">
-                        <fieldset>
-                        <legend>Address</legend>
-                            {makeContactMethods(this.props.initialValues.get('contact_method'))}
-                        </fieldset>
+                        {makeContactMethods(this.props.initialValues.get('contact_method'))}
                     </div>
                     <div className="form-group">
                         <fieldset>
@@ -176,13 +198,7 @@ class CustomerForm extends Component {
                             {makeFormTextField("loyalty_account.account_number", "Account number:")}
                         </fieldset>
                     </div>
-                    <div className="form-group">
-                        <fieldset>
-                        <legend>Customer account</legend>
-                            {makeFormTextField("customer_account.type", "Name:")}
-                            {makeFormTextField("customer_account.id", "Account number:")}
-                        </fieldset>
-                    </div>
+                    {makeCustomerAccount(this.props.initialValues.get('customer_account'))}
                     <div className="form-group">
                     <button action="submit" className="col-sm-offset-2 btn btn-danger" disabled={submitting}>Save changes</button>
                     </div>

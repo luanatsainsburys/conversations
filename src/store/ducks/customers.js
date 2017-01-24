@@ -25,9 +25,7 @@ export default function reducer(state = initialState.get('foundCustomer'), actio
            return Immutable.Map.of('customer', transformYesNo(action.customer),'success', true, 'errorMessage', '');
 
         case FETCH_CUSTOMER_FAILURE:
-            //TOD!!!Remove this line and replace with one below when the back end service works
-            return Immutable.Map.of('customer', transformYesNo(Immutable.fromJS(sampleCustomer)),'success', true, 'errorMessage', '');
-            // return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', action.error.message);
+            return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', action.error.message);
 
         case RESET_FOUND_CUSTOMER:
             return Immutable.Map.of('customer', Immutable.Map(),'success', false, 'errorMessage', '');
@@ -119,7 +117,7 @@ export function getFoundCustomer (state) {
 }
 
 function transformYesNo (customer){
-    if (customer.isEmpty()) return customer;
+    if (customer.isEmpty() || !customer.has('suppressions')) return customer;
 
     //Change Yes/No to true/false for suppressions flags
     let transformed = customer.get('suppressions').map((value) => 
