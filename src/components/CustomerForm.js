@@ -22,6 +22,13 @@ const validate = values => {
     return errors;
 };
 
+function capitalize([h, ...t]) { return h.toUpperCase() + t.join('').toLowerCase();}
+
+function toSentenceCase (str) {
+    const no_ = str.replace(/_/g, ' ');
+    return capitalize(no_);
+}
+
 function makeFormTextField (name, text) {
     return (
         <div className="form-group">
@@ -135,13 +142,27 @@ function makeCustomerAccount(custAcc) {
 } 
 
 function makeLoyaltyAccount(account) {
+    function showField(name) {
+        return account.has(name) 
+            ?makeFormTextField("loyalty_account." + name, toSentenceCase(name)) :null;
+    }
+
     if (!account) return null;
     return (
         <div className="form-group">
             <fieldset>
             <legend>Loyalty account</legend>
-                {makeFormTextField("loyalty_account.loyalty_name", "Name")}
-                {makeFormTextField("loyalty_account.account_number", "Account number")}
+                {showField('loyalty_name')}
+                {showField('account_number')}
+                {showField('card_number')}
+                {showField('valid_from')}
+                {showField('valid_to')}
+                {showField('status')}
+                {showField('status_reason_code')}
+                {showField('loyalty_customer_id')}
+                {showField('tier_id')}
+                {showField('collector_type')}
+                {showField('last_update_date')}
             </fieldset>
         </div>
     );
