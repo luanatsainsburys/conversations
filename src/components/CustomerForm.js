@@ -170,6 +170,20 @@ class CustomerForm extends Component {
                         </fieldset>
                     </div>
                     <div className="form-group">
+                        <fieldset>
+                        <legend>Loyalty account</legend>
+                            {makeFormTextField("loyalty_account.loyalty_name", "Name:")}
+                            {makeFormTextField("loyalty_account.account_number", "Account number:")}
+                        </fieldset>
+                    </div>
+                    <div className="form-group">
+                        <fieldset>
+                        <legend>Customer account</legend>
+                            {makeFormTextField("customer_account.type", "Name:")}
+                            {makeFormTextField("customer_account.id", "Account number:")}
+                        </fieldset>
+                    </div>
+                    <div className="form-group">
                     <button action="submit" className="col-sm-offset-2 btn btn-danger" disabled={submitting}>Save changes</button>
                     </div>
                 </form>
