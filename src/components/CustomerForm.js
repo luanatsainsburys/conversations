@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+/* eslint-disable react/no-multi-comp */
 
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
@@ -43,28 +44,6 @@ function makeCheckbox (objName, propName) {
     );
 }
 
-//imMap - immutable map of the 'contact_method' section of the customer profile record
-//The problem is we wish to display the fields in a certain order rather than random order
-//So this method might not be that useful for now.
-function makeContactMethodsDynamic(imMap) {
-    if (!imMap) return imMap;
-
-    let allFields = [];
-
-    imMap.forEach(item=>{
- //       const [...allKeys]= item.keys();
-//        const [addressKeys] = item.get('address').keys();
-//        const [addressKeys] = item.get('address').keys();
-        let iter = item.get('address').keys(), next;
-
-        while (!(next = iter.next()).done) {
-            allFields.push(makeFormTextField('contact_method[0].address.'+ next.value, next.value));
-        }
-    });
-
-    return allFields;
-}
-
 function makeSuppressionFields(suppMap) {
     let suppFields = [];
     if (!suppMap) return [];
@@ -80,9 +59,10 @@ function makeSuppressionFields(suppMap) {
     suppFields.push(makeCheckbox("suppressions","is_national_deceased_registered"));
     return (
         <div className="form-group">
-            <label className="col-sm-2 control-label">Suppressions:</label>
-            <fieldset className="col-sm-4">
-            {suppFields}
+            <fieldset><legend>Suppressions</legend>
+                <div className="col-sm-offset-2">
+                {suppFields}
+                </div>
             </fieldset>
         </div>
     );
@@ -98,29 +78,43 @@ function makeContactMethods(imMap) {
     //Process contact method list
     while (!(next = iter.next()).done) {
         index = next.value[0];
-        let addressFields= [];
+        let addressFields= [], contactRecord=next.value[1];
         
-        //Process address
-        addressFields.push(makeFormTextField('contact_method[' + index + '].address.residence_number', 'residence_number'));
-        addressFields.push(makeFormTextField('contact_method[' + index + '].address.line1', 'line1'));
-        addressFields.push(makeFormTextField('contact_method[' + index + '].address.line2', 'line2'));
-        addressFields.push(makeFormTextField('contact_method[' + index + '].address.line3', 'line3'));
-        addressFields.push(makeFormTextField('contact_method[' + index + '].address.city', 'city'));
-        addressFields.push(makeFormTextField('contact_method[' + index + '].address.county', 'county'));
-        addressFields.push(makeFormTextField('contact_method[' + index + '].address.postcode', 'postcode'));
-        addressFields.push(makeFormTextField('contact_method[' + index + '].address.country', 'country'));
-        addressFields.push(makeFormTextField('contact_method[' + index + '].address.paf_key', 'paf_key'));
-        addressFields.push(makeFormTextField('contact_method[' + index + '].address.last_update_date', 'last_update_date'));
-        allFields.push(<fieldset><legend>Address</legend>{addressFields}</fieldset>);
+        //Process address if exists
+        if (contactRecord.has('address')) {
+            addressFields.push(makeFormTextField('contact_method[' + index + '].address.residence_number', 'residence_number'));
+            addressFields.push(makeFormTextField('contact_method[' + index + '].address.line1', 'line1'));
+            addressFields.push(makeFormTextField('contact_method[' + index + '].address.line2', 'line2'));
+            addressFields.push(makeFormTextField('contact_method[' + index + '].address.line3', 'line3'));
+            addressFields.push(makeFormTextField('contact_method[' + index + '].address.city', 'city'));
+            addressFields.push(makeFormTextField('contact_method[' + index + '].address.county', 'county'));
+            addressFields.push(makeFormTextField('contact_method[' + index + '].address.postcode', 'postcode'));
+            addressFields.push(makeFormTextField('contact_method[' + index + '].address.country', 'country'));
+            addressFields.push(makeFormTextField('contact_method[' + index + '].address.paf_key', 'paf_key'));
+            addressFields.push(makeFormTextField('contact_method[' + index + '].address.last_update_date', 'last_update_date'));
+            allFields.push(<fieldset><legend>Address</legend>{addressFields}</fieldset>);
+        }
 
         //Process phone list if exists
-        if (next.value[1].has('phone')) {
-            let iterPhones = next.value[1].get('phone').entries(), nextPhone, phoneFields= []; 
+        if (contactRecord.has('phone')) {
+            let iterPhones = contactRecord.get('phone').entries(), nextPhone, phoneFields= []; 
             while (!(nextPhone = iterPhones.next()).done) {
-                phoneFields.push(makeFormTextField('contact_method[' + index + '].phone[' + nextPhone.value[0] + '].formatted_number', 
-                                                    nextPhone.value[1].get('type')));
+                let [phoneKey, phoneRecord] = nextPhone.value;
+                phoneFields.push(makeFormTextField('contact_method[' + index + '].phone[' + phoneKey + '].formatted_number', 
+                                                    phoneRecord.has('type') ?phoneRecord.get('type') :'Phone'));
             }
             allFields.push(<fieldset><legend>Phones</legend>{phoneFields}</fieldset>);
+        }
+
+        //Process email list if exists
+        if (contactRecord.has('email')) {
+            let iterEmails = contactRecord.get('email').entries(), nextEmail, emailFields = []; 
+            while (!(nextEmail = iterEmails.next()).done) {
+                let [emailKey, emailRecord] = nextEmail.value;
+                emailFields.push(makeFormTextField('contact_method[' + index + '].email[' + emailKey + '].email_address', 
+                                                    emailRecord.has('type') ?emailRecord.get('type') :'Email'));
+            }
+            allFields.push(<fieldset><legend>Emails</legend>{emailFields}</fieldset>);
         }
     }
 
@@ -133,8 +127,21 @@ function makeCustomerAccount(custAcc) {
         <div className="form-group">
             <fieldset>
             <legend>Customer account</legend>
-                {makeFormTextField("customer_account.type", "Name:")}
-                {makeFormTextField("customer_account.id", "Account number:")}
+                {makeFormTextField("customer_account.type", "Name")}
+                {makeFormTextField("customer_account.id", "Account number")}
+            </fieldset>
+        </div>
+    );
+} 
+
+function makeLoyaltyAccount(account) {
+    if (!account) return null;
+    return (
+        <div className="form-group">
+            <fieldset>
+            <legend>Loyalty account</legend>
+                {makeFormTextField("loyalty_account.loyalty_name", "Name")}
+                {makeFormTextField("loyalty_account.account_number", "Account number")}
             </fieldset>
         </div>
     );
@@ -144,21 +151,6 @@ class CustomerForm extends Component {
     static propTypes = {
         ...propTypes,
         // other props you might be using
-    }
-
-    componentWillMount() {
-        //let contactMethods = this.props.initialValues.get('contact_method'); //immutable map
-
-        //const [...mykeys]= this.props.initialValues.getIn(['contact_method',0]).keys()
-
-        //["last_update_date", "address", "phone", "email"]
-    }
-
-    componentDidMount() {
-        this.handleInitialize();
-    }
-
-    handleInitialize() {
     }
 
     handleFormSubmit(values) {
@@ -171,13 +163,12 @@ class CustomerForm extends Component {
         return (
             <div className="col-sm-8 col-sm-offset-2">
                 <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="form-horizontal">
-                    {makeFormTextField("name.title", "Title:")}
-                    {makeFormTextField("name.first", "First Name:")}
-                    {makeFormTextField("name.last", "Last Name:")}
-                    {makeFormTextField("name.last_update_date", "Name last update date:")}
-                    {makeFormTextField("name.title", "Title:")}
+                    {makeFormTextField("name.title", "Title")}
+                    {makeFormTextField("name.first", "First Name")}
+                    {makeFormTextField("name.last", "Last Name")}
+                    {makeFormTextField("name.last_update_date", "Name last update date")}
                     <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="Gender">Gender:</label>
+                        <label className="col-sm-2 control-label" htmlFor="Gender">Gender</label>
                         <div className="col-sm-4">
                             <Field name="gender" component="select" className="form-control">
                                 <option/>
@@ -186,21 +177,15 @@ class CustomerForm extends Component {
                             </Field>
                         </div>
                     </div>
-                    {makeFormTextField("date_of_birth", "Date of Birth:")}
+                    {makeFormTextField("date_of_birth", "Date of Birth")}
                     {makeSuppressionFields(this.props.initialValues.get('suppressions'))}
                     <div className="form-group">
                         {makeContactMethods(this.props.initialValues.get('contact_method'))}
                     </div>
-                    <div className="form-group">
-                        <fieldset>
-                        <legend>Loyalty account</legend>
-                            {makeFormTextField("loyalty_account.loyalty_name", "Name:")}
-                            {makeFormTextField("loyalty_account.account_number", "Account number:")}
-                        </fieldset>
-                    </div>
+                    {makeLoyaltyAccount(this.props.initialValues.get('loyalty_account'))}
                     {makeCustomerAccount(this.props.initialValues.get('customer_account'))}
                     <div className="form-group">
-                    <button action="submit" className="col-sm-offset-2 btn btn-danger" disabled={submitting}>Save changes</button>
+                        <button action="submit" className="col-sm-offset-2 btn btn-danger" disabled={submitting}>Save changes</button>
                     </div>
                 </form>
             </div>
@@ -223,8 +208,8 @@ function mapDispatchToProps(dispatch) {
 // Decorate with reduxForm(). It will read the initialValues prop provided by connect()
 let boundForm = reduxForm({
     form: 'CustomerForm',  // a unique identifier for this form
-    enableReinitialize: true,
-    //validate,
+    //enableReinitialize: true,
+    validate,
 })(CustomerForm);
 
 export default connect(mapStateToProps,mapDispatchToProps)(boundForm);
