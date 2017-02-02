@@ -1,9 +1,13 @@
 import React, {Component, PropTypes} from 'react';
+
+//Store
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {fetchConversations} from '../store/ducks/conversations';
-
+import {fetchConversations} from '../store/modules/conversations';
 import Immutable from 'immutable';
+
+//Components
+import QuantityBadge from '../components/QuantityBadge';
 
 function renderConversations(convsMap) {
     let iter = convsMap.entries(), conv, allConvs = [];
@@ -27,6 +31,12 @@ class ConversationsPage extends Component {
                 <ul>
                     {renderConversations(this.props.conversations.get('data'))}
                 </ul>
+                <h3>Examples quantity badges</h3>
+                <QuantityBadge quantity={100} label="Books"/>
+                <QuantityBadge quantity={200} label="Pens"/>
+                <QuantityBadge quantity={300} label="Pencils"/>
+                <QuantityBadge quantity={400} label="Exercises"/>
+                <QuantityBadge quantity={66} label="Marks"/>
             </div>
         );
     }
